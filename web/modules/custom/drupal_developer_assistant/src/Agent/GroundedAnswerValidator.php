@@ -16,7 +16,7 @@ final class GroundedAnswerValidator implements GroundedAnswerValidatorInterface 
   /**
    * Matches the required path, line range, and symbol citation.
    */
-  private const string CITATION_PATTERN = '/Evidence:\s*`?([^`:\r\n]+):(\d+)(?:-(\d+))?\s+—\s+([^`\r\n]+)`?/u';
+  private const string CITATION_PATTERN = '/Evidence:\s*`?([^`:\r\n]+):(\d+)(?:-(\d+))?\s+—\s+([^`\r\n]+)`?\s*$/mu';
 
   /**
    * {@inheritdoc}
@@ -94,6 +94,14 @@ final class GroundedAnswerValidator implements GroundedAnswerValidatorInterface 
           ? (int) $citation[3]
           : $start_line;
         $symbol = trim($citation[4], " `\t\n\r\0\x0B.");
+        if ($end_line < $start_line) {
+          $errors[] = sprintf(
+            'Citation line range %d-%d is reversed.',
+            $start_line,
+            $end_line,
+          );
+          continue;
+        }
         if (!isset($catalog[$path][$symbol])) {
           $errors[] = sprintf(
             'Citation "%s — %s" was not present in retrieved source evidence.',

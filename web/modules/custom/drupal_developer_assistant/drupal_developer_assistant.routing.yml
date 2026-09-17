@@ -222,7 +222,7 @@ drupal_developer_assistant.module_evidence:
     _controller: 'Drupal\drupal_developer_assistant\Controller\ModuleEvidenceController::view'
     _title: 'Source evidence'
   requirements:
-    _permission: 'view drupal developer assistant source'
+    _permission: 'access drupal developer assistant,view drupal developer assistant source'
     module_id: '[a-z0-9_]+'
     evidence_id: '[a-f0-9]{64}'
   options:

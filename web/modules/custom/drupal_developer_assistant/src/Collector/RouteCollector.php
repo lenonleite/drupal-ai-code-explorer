@@ -222,10 +222,6 @@ final class RouteCollector implements CollectorInterface {
     }
 
     $class_candidate = ltrim($candidate, '\\');
-    if (class_exists($class_candidate)) {
-      return $class_candidate;
-    }
-
     return $service_classes[$candidate]
       ?? $service_classes[$class_candidate]
       ?? (str_contains($class_candidate, '\\') ? $class_candidate : NULL);

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\drupal_developer_assistant\Unit\Resolver;
 
+use Composer\Autoload\ClassLoader;
 use Drupal\drupal_developer_assistant\Resolver\ReflectionSourcePathResolver;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\Group;
@@ -23,7 +24,10 @@ final class ReflectionSourcePathResolverTest extends UnitTestCase {
    * Tests class and function source paths relative to the Drupal root.
    */
   public function testResolvesClassesAndFunctions(): void {
-    $resolver = new ReflectionSourcePathResolver(DRUPAL_ROOT);
+    $resolver = new ReflectionSourcePathResolver(
+      DRUPAL_ROOT,
+      new ClassLoader(),
+    );
     $expected = 'modules/custom/drupal_developer_assistant/tests/src/Unit/Resolver/ReflectionSourcePathResolverTest.php';
 
     $this->assertSame($expected, $resolver->resolve(self::class));
@@ -35,6 +39,7 @@ final class ReflectionSourcePathResolverTest extends UnitTestCase {
     );
     $this->assertNull($resolver->resolve('Missing\\ExampleClass'));
     $this->assertNull($resolver->resolveFunction('missing_example_function'));
+    $this->assertNull($resolver->resolve(ClassLoader::class));
   }
 
   /**
@@ -42,16 +47,25 @@ final class ReflectionSourcePathResolverTest extends UnitTestCase {
    */
   public function testReturnsNullWhenClassAutoloadingFails(): void {
     $class_name = 'Drupal\\optional\\BrokenHandler';
-    $loader = static function (string $requested_class) use ($class_name): void {
+    $autoloaded = FALSE;
+    $loader = static function (string $requested_class) use (
+      $class_name,
+      &$autoloaded,
+    ): void {
       if ($requested_class === $class_name) {
+        $autoloaded = TRUE;
         throw new \Error('The optional parent class is unavailable.');
       }
     };
     spl_autoload_register($loader);
 
     try {
-      $resolver = new ReflectionSourcePathResolver(DRUPAL_ROOT);
+      $resolver = new ReflectionSourcePathResolver(
+        DRUPAL_ROOT,
+        new ClassLoader(),
+      );
       $this->assertNull($resolver->resolve($class_name));
+      $this->assertFalse($autoloaded);
     }
     finally {
       spl_autoload_unregister($loader);

@@ -297,6 +297,10 @@ final readonly class ModuleEvidenceResolver implements ModuleEvidenceResolverInt
       return NULL;
     }
 
+    $size = filesize($file_path);
+    if ($size === FALSE || $size > $this->limits->maxFileBytes) {
+      return NULL;
+    }
     $content = file_get_contents($file_path);
     if ($content === FALSE || !mb_check_encoding($content, 'UTF-8')) {
       return NULL;

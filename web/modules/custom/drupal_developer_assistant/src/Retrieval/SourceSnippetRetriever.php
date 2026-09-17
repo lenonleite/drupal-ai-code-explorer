@@ -339,6 +339,7 @@ final class SourceSnippetRetriever implements SourceSnippetRetrieverInterface {
     $truncated = $end < $requested_end;
     if (strlen($content) > $byte_limit) {
       $content = mb_strcut($content, 0, $byte_limit - 3, 'UTF-8') . '...';
+      $end = $start + substr_count($content, "\n");
       $truncated = TRUE;
     }
 

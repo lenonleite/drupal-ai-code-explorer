@@ -171,7 +171,9 @@ services:
 
   Drupal\drupal_developer_assistant\Resolver\ReflectionSourcePathResolver:
     class: Drupal\drupal_developer_assistant\Resolver\ReflectionSourcePathResolver
-    arguments: ['%app.root%']
+    arguments:
+      - '%app.root%'
+      - '@class_loader'
 
   Drupal\drupal_developer_assistant\Resolver\SourcePathResolverInterface: '@Drupal\drupal_developer_assistant\Resolver\ReflectionSourcePathResolver'
 

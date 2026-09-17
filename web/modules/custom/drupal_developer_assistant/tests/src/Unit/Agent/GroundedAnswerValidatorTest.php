@@ -108,6 +108,47 @@ MARKDOWN;
   }
 
   /**
+   * Tests rejection of trailing claims and reversed citation ranges.
+   */
+  public function testRejectsMalformedCitations(): void {
+    $trailing_claim = <<<'MARKDOWN'
+### Confirmed by source
+- Cron runs automatically. Evidence: `src/EventSubscriber/AutomatedCron.php:31-43 — Drupal\automated_cron\EventSubscriber\AutomatedCron::onTerminate` This extra claim is unsupported.
+
+### Unavailable because redacted
+- Exact values are unavailable.
+MARKDOWN;
+    $trailing_errors = $this->validator->validate(
+      $trailing_claim,
+      'How does cron run?',
+      'core/modules/automated_cron',
+      [$this->snippet()],
+    );
+    $this->assertStringContainsString(
+      'must end with one path',
+      implode(' ', $trailing_errors),
+    );
+
+    $reversed_range = <<<'MARKDOWN'
+### Confirmed by source
+- Cron runs automatically. Evidence: `src/EventSubscriber/AutomatedCron.php:40-35 — Drupal\automated_cron\EventSubscriber\AutomatedCron::onTerminate`
+
+### Unavailable because redacted
+- Exact values are unavailable.
+MARKDOWN;
+    $range_errors = $this->validator->validate(
+      $reversed_range,
+      'How does cron run?',
+      'core/modules/automated_cron',
+      [$this->snippet()],
+    );
+    $this->assertStringContainsString(
+      'line range 40-35 is reversed',
+      implode(' ', $range_errors),
+    );
+  }
+
+  /**
    * Creates a source snippet containing redacted literals.
    */
   private function snippet(): SourceSnippet {

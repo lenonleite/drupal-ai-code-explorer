@@ -157,4 +157,59 @@ final class RouteCollectorTest extends UnitTestCase {
     );
   }
 
+  /**
+   * Tests that collecting a route does not autoload its controller class.
+   */
+  public function testDoesNotAutoloadControllerClasses(): void {
+    $class_name = 'Drupal\\example\\Controller\\DangerousController';
+    $autoloaded = FALSE;
+    $loader = static function (string $requested_class) use (
+      $class_name,
+      &$autoloaded,
+    ): void {
+      if ($requested_class === $class_name) {
+        $autoloaded = TRUE;
+      }
+    };
+    spl_autoload_register($loader);
+
+    try {
+      $route_provider = $this->createMock(RouteProviderInterface::class);
+      $route_provider->method('getAllRoutes')->willReturn([
+        'example.dangerous' => new Route(
+          '/dangerous',
+          ['_controller' => $class_name . '::build'],
+        ),
+      ]);
+      $kernel = $this->createMock(DrupalKernelInterface::class);
+      $kernel->method('getCachedContainerDefinition')->willReturn([
+        'services' => [],
+      ]);
+      $entity_type_manager = $this->createMock(
+        EntityTypeManagerInterface::class,
+      );
+      $entity_type_manager->method('getDefinitions')->willReturn([]);
+      $source_path_resolver = $this->createMock(
+        SourcePathResolverInterface::class,
+      );
+
+      $collector = new RouteCollector(
+        $route_provider,
+        new ServiceCollector($kernel),
+        new EntityTypeCollector(
+          $entity_type_manager,
+          $source_path_resolver,
+        ),
+        $source_path_resolver,
+      );
+      $routes = $collector->collect();
+
+      $this->assertFalse($autoloaded);
+      $this->assertSame($class_name, $routes[0]->targetClass);
+    }
+    finally {
+      spl_autoload_unregister($loader);
+    }
+  }
+
 }

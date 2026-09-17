@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\drupal_developer_assistant\Unit\Collector;
 
+use Composer\Autoload\ClassLoader;
 use Drupal\Core\Action\ActionManager;
 use Drupal\Core\Action\Plugin\Action\GotoAction;
 use Drupal\drupal_developer_assistant\Collector\ActionPluginCollector;
@@ -22,6 +23,11 @@ final class ActionPluginCollectorTest extends UnitTestCase {
    * Tests normalized and sorted Action plugin records.
    */
   public function testCollectsActionPlugins(): void {
+    $class_loader = new ClassLoader();
+    $class_loader->addPsr4(
+      'Drupal\\Core\\',
+      DRUPAL_ROOT . '/core/lib/Drupal/Core',
+    );
     $action_manager = $this->createMock(ActionManager::class);
     $action_manager->method('getDefinitions')->willReturn([
       'zeta' => [
@@ -40,7 +46,7 @@ final class ActionPluginCollectorTest extends UnitTestCase {
 
     $collector = new ActionPluginCollector(
       $action_manager,
-      new ReflectionSourcePathResolver(DRUPAL_ROOT),
+      new ReflectionSourcePathResolver(DRUPAL_ROOT, $class_loader),
     );
 
     $this->assertSame('plugins.action', $collector->id());

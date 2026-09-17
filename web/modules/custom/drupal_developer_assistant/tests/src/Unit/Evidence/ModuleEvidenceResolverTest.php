@@ -114,25 +114,42 @@ final class ModuleEvidenceResolverTest extends UnitTestCase {
   }
 
   /**
+   * Tests that a stale cached size cannot bypass the current file-size limit.
+   */
+  public function testRejectsFileThatGrewBeyondLimit(): void {
+    $limits = new SourceRetrievalLimits(maxFileBytes: 32);
+    $resolver = $this->resolver($limits);
+    $evidence = $resolver->resolve(
+      $this->architecture(reported_size: 1),
+      $resolver->referenceId('example', 'src/ExampleService.php', ''),
+    );
+
+    $this->assertNotNull($evidence);
+    $this->assertNull($evidence->content);
+  }
+
+  /**
    * Creates the resolver under test.
    */
-  private function resolver(): ModuleEvidenceResolver {
+  private function resolver(
+    ?SourceRetrievalLimits $limits = NULL,
+  ): ModuleEvidenceResolver {
     return new ModuleEvidenceResolver(
       $this->appRoot,
-      new SourceRetrievalLimits(),
+      $limits ?? new SourceRetrievalLimits(),
     );
   }
 
   /**
    * Creates architecture containing one known PHP method.
    */
-  private function architecture(): ModuleArchitecture {
+  private function architecture(?int $reported_size = NULL): ModuleArchitecture {
     $source_file = new ModuleSourceFileComponent(
       moduleId: 'example',
       relativePath: 'src/ExampleService.php',
       fileType: 'PHP',
       category: 'Source code',
-      size: strlen($this->source),
+      size: $reported_size ?? strlen($this->source),
       sourcePath: 'modules/custom/example/src/ExampleService.php',
     );
     $method = new PhpMethod(

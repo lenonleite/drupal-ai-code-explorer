@@ -1250,6 +1250,30 @@ final class InspectorPageTest extends BrowserTestBase {
   }
 
   /**
+   * Tests that source evidence requires both restricted permissions.
+   */
+  public function testModuleEvidenceAccessRequiresBothPermissions(): void {
+    $path = '/admin/reports/drupal-developer-assistant/modules/drupal_developer_assistant/evidence/'
+      . str_repeat('0', 64);
+    $source_only_account = $this->drupalCreateUser([
+      'view drupal developer assistant source',
+    ]);
+    $this->assertNotFalse($source_only_account);
+    $this->drupalLogin($source_only_account);
+    $this->drupalGet($path);
+    $this->assertSession()->statusCodeEquals(403);
+
+    $account = $this->drupalCreateUser([
+      'access drupal developer assistant',
+      'view drupal developer assistant source',
+    ]);
+    $this->assertNotFalse($account);
+    $this->drupalLogin($account);
+    $this->drupalGet($path);
+    $this->assertSession()->statusCodeEquals(404);
+  }
+
+  /**
    * Logs in a user who can access the inspector.
    */
   private function loginInspectorUser(): void {

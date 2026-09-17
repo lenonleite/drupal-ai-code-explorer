@@ -131,6 +131,27 @@ PHP;
     $this->assertGreaterThanOrEqual(3, $snippet->redactions);
     $this->assertFalse($snippet->truncated);
     $this->assertJson(json_encode($snippet, JSON_THROW_ON_ERROR));
+
+    $bounded_retriever = new SourceSnippetRetriever(
+      $this->testRoot,
+      new SourceRetrievalLimits(
+        maxSnippets: 1,
+        maxSnippetBytes: 80,
+      ),
+    );
+    $bounded_snippets = $bounded_retriever->retrieve(
+      $architecture,
+      'How does calculateSecret work?',
+    );
+    $this->assertCount(1, $bounded_snippets);
+    $bounded_snippet = $bounded_snippets[0];
+    $this->assertTrue($bounded_snippet->truncated);
+    $this->assertSame(
+      $bounded_snippet->startLine
+        + substr_count($bounded_snippet->content, "\n"),
+      $bounded_snippet->endLine,
+    );
+    $this->assertLessThan($snippet->endLine, $bounded_snippet->endLine);
   }
 
   /**

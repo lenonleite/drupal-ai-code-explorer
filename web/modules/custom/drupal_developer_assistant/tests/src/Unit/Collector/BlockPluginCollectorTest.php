@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\drupal_developer_assistant\Unit\Collector;
 
+use Composer\Autoload\ClassLoader;
 use Drupal\Core\Block\BlockManager;
 use Drupal\Core\Block\BlockManagerInterface;
 use Drupal\drupal_developer_assistant\Collector\BlockPluginCollector;
@@ -22,6 +23,11 @@ final class BlockPluginCollectorTest extends UnitTestCase {
    * Tests normalized and sorted Block plugin records.
    */
   public function testCollectsBlockPlugins(): void {
+    $class_loader = new ClassLoader();
+    $class_loader->addPsr4(
+      'Drupal\\Core\\',
+      DRUPAL_ROOT . '/core/lib/Drupal/Core',
+    );
     $block_manager = $this->createMock(BlockManagerInterface::class);
     $block_manager->method('getDefinitions')->willReturn([
       'zeta' => [
@@ -38,7 +44,7 @@ final class BlockPluginCollectorTest extends UnitTestCase {
 
     $collector = new BlockPluginCollector(
       $block_manager,
-      new ReflectionSourcePathResolver(DRUPAL_ROOT),
+      new ReflectionSourcePathResolver(DRUPAL_ROOT, $class_loader),
     );
 
     $this->assertSame('plugins.block', $collector->id());
