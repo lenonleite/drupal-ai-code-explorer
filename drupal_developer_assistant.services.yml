@@ -1,0 +1,322 @@
+services:
+  logger.channel.drupal_developer_assistant:
+    parent: logger.channel_base
+    arguments: ['drupal_developer_assistant']
+
+  Drupal\drupal_developer_assistant\Agent\AgentProgressLabeler:
+    class: Drupal\drupal_developer_assistant\Agent\AgentProgressLabeler
+
+  Drupal\drupal_developer_assistant\EventSubscriber\AgentExplorerProgressSubscriber:
+    class: Drupal\drupal_developer_assistant\EventSubscriber\AgentExplorerProgressSubscriber
+    arguments:
+      - '@entity_type.manager'
+      - '@Drupal\drupal_developer_assistant\Agent\AgentProgressLabeler'
+    tags:
+      - { name: event_subscriber }
+
+  Drupal\drupal_developer_assistant\Collector\CollectorManager:
+    class: Drupal\drupal_developer_assistant\Collector\CollectorManager
+    tags:
+      - { name: service_collector, tag: drupal_developer_assistant.collector, call: addCollector, required: true }
+
+  Drupal\drupal_developer_assistant\Collector\CollectorManagerInterface: '@Drupal\drupal_developer_assistant\Collector\CollectorManager'
+
+  Drupal\drupal_developer_assistant\Collector\ModuleCollector:
+    class: Drupal\drupal_developer_assistant\Collector\ModuleCollector
+    arguments:
+      - '@module_handler'
+      - '@Drupal\Core\Extension\InfoParserInterface'
+    tags:
+      - { name: drupal_developer_assistant.collector }
+
+  Drupal\drupal_developer_assistant\Collector\ServiceCollector:
+    class: Drupal\drupal_developer_assistant\Collector\ServiceCollector
+    arguments: ['@kernel']
+    tags:
+      - { name: drupal_developer_assistant.collector }
+
+  Drupal\drupal_developer_assistant\Collector\PluginManagerCollector:
+    class: Drupal\drupal_developer_assistant\Collector\PluginManagerCollector
+    arguments: ['@Drupal\drupal_developer_assistant\Collector\ServiceCollector']
+    tags:
+      - { name: drupal_developer_assistant.collector }
+
+  Drupal\drupal_developer_assistant\Collector\BlockPluginCollector:
+    class: Drupal\drupal_developer_assistant\Collector\BlockPluginCollector
+    arguments:
+      - '@Drupal\Core\Block\BlockManagerInterface'
+      - '@Drupal\drupal_developer_assistant\Resolver\SourcePathResolverInterface'
+    tags:
+      - { name: drupal_developer_assistant.collector }
+
+  Drupal\drupal_developer_assistant\Collector\ActionPluginCollector:
+    class: Drupal\drupal_developer_assistant\Collector\ActionPluginCollector
+    arguments:
+      - '@plugin.manager.action'
+      - '@Drupal\drupal_developer_assistant\Resolver\SourcePathResolverInterface'
+    tags:
+      - { name: drupal_developer_assistant.collector }
+
+  Drupal\drupal_developer_assistant\Collector\EntityTypeCollector:
+    class: Drupal\drupal_developer_assistant\Collector\EntityTypeCollector
+    arguments:
+      - '@Drupal\Core\Entity\EntityTypeManagerInterface'
+      - '@Drupal\drupal_developer_assistant\Resolver\SourcePathResolverInterface'
+    tags:
+      - { name: drupal_developer_assistant.collector }
+
+  Drupal\drupal_developer_assistant\Collector\RouteCollector:
+    class: Drupal\drupal_developer_assistant\Collector\RouteCollector
+    arguments:
+      - '@Drupal\Core\Routing\RouteProviderInterface'
+      - '@Drupal\drupal_developer_assistant\Collector\ServiceCollector'
+      - '@Drupal\drupal_developer_assistant\Collector\EntityTypeCollector'
+      - '@Drupal\drupal_developer_assistant\Resolver\SourcePathResolverInterface'
+    tags:
+      - { name: drupal_developer_assistant.collector }
+
+  Drupal\drupal_developer_assistant\Collector\NavigationCollector:
+    class: Drupal\drupal_developer_assistant\Collector\NavigationCollector
+    arguments:
+      - '@module_handler'
+      - '%app.root%'
+    tags:
+      - { name: drupal_developer_assistant.collector }
+
+  Drupal\drupal_developer_assistant\Collector\ControllerCollector:
+    class: Drupal\drupal_developer_assistant\Collector\ControllerCollector
+    arguments:
+      - '@Drupal\drupal_developer_assistant\Collector\RouteCollector'
+    tags:
+      - { name: drupal_developer_assistant.collector }
+
+  Drupal\drupal_developer_assistant\Collector\FormCollector:
+    class: Drupal\drupal_developer_assistant\Collector\FormCollector
+    arguments:
+      - '@Drupal\drupal_developer_assistant\Collector\RouteCollector'
+    tags:
+      - { name: drupal_developer_assistant.collector }
+
+  Drupal\drupal_developer_assistant\Collector\HookCollector:
+    class: Drupal\drupal_developer_assistant\Collector\HookCollector
+    arguments:
+      - '@Drupal\Core\KeyValueStore\KeyValueFactoryInterface'
+      - '@Drupal\drupal_developer_assistant\Resolver\SourcePathResolverInterface'
+    tags:
+      - { name: drupal_developer_assistant.collector }
+
+  Drupal\drupal_developer_assistant\Collector\ConfigurationCollector:
+    class: Drupal\drupal_developer_assistant\Collector\ConfigurationCollector
+    arguments:
+      - '@Drupal\Core\Config\ConfigFactoryInterface'
+      - '@Drupal\Core\Config\ConfigManagerInterface'
+      - '@Drupal\drupal_developer_assistant\Collector\EntityTypeCollector'
+    tags:
+      - { name: drupal_developer_assistant.collector }
+
+  Drupal\drupal_developer_assistant\Relationship\RelationshipManager:
+    class: Drupal\drupal_developer_assistant\Relationship\RelationshipManager
+    tags:
+      - { name: service_collector, tag: drupal_developer_assistant.relationship_resolver, call: addResolver, required: true }
+
+  Drupal\drupal_developer_assistant\Relationship\RelationshipManagerInterface: '@Drupal\drupal_developer_assistant\Relationship\RelationshipManager'
+
+  Drupal\drupal_developer_assistant\Relationship\RouteRelationshipResolver:
+    class: Drupal\drupal_developer_assistant\Relationship\RouteRelationshipResolver
+    arguments:
+      - '@Drupal\drupal_developer_assistant\Collector\RouteCollector'
+    tags:
+      - { name: drupal_developer_assistant.relationship_resolver }
+
+  Drupal\drupal_developer_assistant\Relationship\NavigationRelationshipResolver:
+    class: Drupal\drupal_developer_assistant\Relationship\NavigationRelationshipResolver
+    arguments:
+      - '@Drupal\drupal_developer_assistant\Collector\NavigationCollector'
+    tags:
+      - { name: drupal_developer_assistant.relationship_resolver }
+
+  Drupal\drupal_developer_assistant\Relationship\EntityRelationshipResolver:
+    class: Drupal\drupal_developer_assistant\Relationship\EntityRelationshipResolver
+    arguments:
+      - '@Drupal\drupal_developer_assistant\Collector\EntityTypeCollector'
+      - '@Drupal\drupal_developer_assistant\Resolver\SourcePathResolverInterface'
+    tags:
+      - { name: drupal_developer_assistant.relationship_resolver }
+
+  Drupal\drupal_developer_assistant\Relationship\ModuleRelationshipResolver:
+    class: Drupal\drupal_developer_assistant\Relationship\ModuleRelationshipResolver
+    arguments:
+      - '@Drupal\drupal_developer_assistant\Collector\ModuleCollector'
+      - '@Drupal\drupal_developer_assistant\Collector\BlockPluginCollector'
+      - '@Drupal\drupal_developer_assistant\Collector\ActionPluginCollector'
+      - '@Drupal\drupal_developer_assistant\Collector\HookCollector'
+      - '@Drupal\drupal_developer_assistant\Collector\ConfigurationCollector'
+    tags:
+      - { name: drupal_developer_assistant.relationship_resolver }
+
+  Drupal\drupal_developer_assistant\Relationship\ConfigurationRelationshipResolver:
+    class: Drupal\drupal_developer_assistant\Relationship\ConfigurationRelationshipResolver
+    arguments:
+      - '@Drupal\drupal_developer_assistant\Collector\ConfigurationCollector'
+    tags:
+      - { name: drupal_developer_assistant.relationship_resolver }
+
+  Drupal\drupal_developer_assistant\Relationship\ServiceRelationshipResolver:
+    class: Drupal\drupal_developer_assistant\Relationship\ServiceRelationshipResolver
+    arguments:
+      - '@Drupal\drupal_developer_assistant\Collector\ServiceCollector'
+      - '@Drupal\drupal_developer_assistant\Resolver\SourcePathResolverInterface'
+    tags:
+      - { name: drupal_developer_assistant.relationship_resolver }
+
+  Drupal\drupal_developer_assistant\Resolver\ReflectionSourcePathResolver:
+    class: Drupal\drupal_developer_assistant\Resolver\ReflectionSourcePathResolver
+    arguments:
+      - '%app.root%'
+      - '@class_loader'
+
+  Drupal\drupal_developer_assistant\Resolver\SourcePathResolverInterface: '@Drupal\drupal_developer_assistant\Resolver\ReflectionSourcePathResolver'
+
+  cache.drupal_developer_assistant_architecture:
+    class: Drupal\Core\Cache\CacheBackendInterface
+    tags:
+      - { name: cache.bin }
+    factory: ['@cache_factory', 'get']
+    arguments: [drupal_developer_assistant_architecture]
+
+  Drupal\drupal_developer_assistant\Architecture\ModuleArchitectureCache:
+    class: Drupal\drupal_developer_assistant\Architecture\ModuleArchitectureCache
+    arguments:
+      - '@cache.drupal_developer_assistant_architecture'
+
+  Drupal\drupal_developer_assistant\Architecture\ModuleArchitectureCacheInterface: '@Drupal\drupal_developer_assistant\Architecture\ModuleArchitectureCache'
+
+  Drupal\drupal_developer_assistant\Architecture\ModuleArchitectureBuilder:
+    class: Drupal\drupal_developer_assistant\Architecture\ModuleArchitectureBuilder
+    arguments:
+      - '@Drupal\drupal_developer_assistant\Collector\CollectorManagerInterface'
+      - '@Drupal\drupal_developer_assistant\Relationship\RelationshipManagerInterface'
+      - '@Drupal\drupal_developer_assistant\Resolver\SourcePathResolverInterface'
+      - '@Drupal\drupal_developer_assistant\Collector\ModuleSourceFileCollectorInterface'
+      - '@Drupal\drupal_developer_assistant\Analyzer\PhpSourceAnalyzerInterface'
+      - '@Drupal\drupal_developer_assistant\Relationship\PhpDependencyResolverInterface'
+      - '@Drupal\drupal_developer_assistant\Architecture\ModuleArchitectureCacheInterface'
+
+  Drupal\drupal_developer_assistant\Architecture\ModuleArchitectureBuilderInterface: '@Drupal\drupal_developer_assistant\Architecture\ModuleArchitectureBuilder'
+
+  Drupal\drupal_developer_assistant\Component\ModuleComponentDetailsResolver:
+    class: Drupal\drupal_developer_assistant\Component\ModuleComponentDetailsResolver
+    arguments:
+      - '@Drupal\drupal_developer_assistant\Architecture\ModuleArchitectureBuilderInterface'
+
+  Drupal\drupal_developer_assistant\Component\ModuleComponentDetailsResolverInterface: '@Drupal\drupal_developer_assistant\Component\ModuleComponentDetailsResolver'
+
+  Drupal\drupal_developer_assistant\Collector\ModuleSourceFileCollector:
+    class: Drupal\drupal_developer_assistant\Collector\ModuleSourceFileCollector
+    arguments: ['%app.root%']
+
+  Drupal\drupal_developer_assistant\Collector\ModuleSourceFileCollectorInterface: '@Drupal\drupal_developer_assistant\Collector\ModuleSourceFileCollector'
+
+  Drupal\drupal_developer_assistant\Analyzer\PhpSourceAnalyzer:
+    class: Drupal\drupal_developer_assistant\Analyzer\PhpSourceAnalyzer
+    arguments: ['%app.root%']
+
+  Drupal\drupal_developer_assistant\Analyzer\PhpSourceAnalyzerInterface: '@Drupal\drupal_developer_assistant\Analyzer\PhpSourceAnalyzer'
+
+  Drupal\drupal_developer_assistant\Relationship\PhpDependencyResolver:
+    class: Drupal\drupal_developer_assistant\Relationship\PhpDependencyResolver
+
+  Drupal\drupal_developer_assistant\Relationship\PhpDependencyResolverInterface: '@Drupal\drupal_developer_assistant\Relationship\PhpDependencyResolver'
+
+  Drupal\drupal_developer_assistant\Context\ModuleContextBuilder:
+    class: Drupal\drupal_developer_assistant\Context\ModuleContextBuilder
+    arguments:
+      - '@Drupal\drupal_developer_assistant\Context\ModuleContextLimits'
+
+  Drupal\drupal_developer_assistant\Context\ModuleContextBuilderInterface: '@Drupal\drupal_developer_assistant\Context\ModuleContextBuilder'
+
+  Drupal\drupal_developer_assistant\Context\ModuleContextLimits:
+    class: Drupal\drupal_developer_assistant\Context\ModuleContextLimits
+
+  Drupal\drupal_developer_assistant\Context\ComponentContextBuilder:
+    class: Drupal\drupal_developer_assistant\Context\ComponentContextBuilder
+    arguments:
+      - '@Drupal\drupal_developer_assistant\Context\ModuleContextBuilderInterface'
+
+  Drupal\drupal_developer_assistant\Context\ComponentContextBuilderInterface: '@Drupal\drupal_developer_assistant\Context\ComponentContextBuilder'
+
+  Drupal\drupal_developer_assistant\Retrieval\SourceRetrievalLimits:
+    class: Drupal\drupal_developer_assistant\Retrieval\SourceRetrievalLimits
+
+  Drupal\drupal_developer_assistant\Retrieval\SourceSnippetRetriever:
+    class: Drupal\drupal_developer_assistant\Retrieval\SourceSnippetRetriever
+    arguments:
+      - '%app.root%'
+      - '@Drupal\drupal_developer_assistant\Retrieval\SourceRetrievalLimits'
+
+  Drupal\drupal_developer_assistant\Retrieval\SourceSnippetRetrieverInterface: '@Drupal\drupal_developer_assistant\Retrieval\SourceSnippetRetriever'
+
+  Drupal\drupal_developer_assistant\Evidence\ModuleEvidenceResolver:
+    class: Drupal\drupal_developer_assistant\Evidence\ModuleEvidenceResolver
+    arguments:
+      - '%app.root%'
+      - '@Drupal\drupal_developer_assistant\Retrieval\SourceRetrievalLimits'
+
+  Drupal\drupal_developer_assistant\Evidence\ModuleEvidenceResolverInterface: '@Drupal\drupal_developer_assistant\Evidence\ModuleEvidenceResolver'
+
+  Drupal\drupal_developer_assistant\Agent\GroundedAnswerValidator:
+    class: Drupal\drupal_developer_assistant\Agent\GroundedAnswerValidator
+
+  Drupal\drupal_developer_assistant\Agent\GroundedAnswerValidatorInterface: '@Drupal\drupal_developer_assistant\Agent\GroundedAnswerValidator'
+
+  Drupal\drupal_developer_assistant\Agent\GroundedAnswerRepairInputBuilder:
+    class: Drupal\drupal_developer_assistant\Agent\GroundedAnswerRepairInputBuilder
+
+  Drupal\drupal_developer_assistant\Agent\GroundedAnswerRepairResponseParser:
+    class: Drupal\drupal_developer_assistant\Agent\GroundedAnswerRepairResponseParser
+
+  Drupal\drupal_developer_assistant\Agent\GroundedAnswerRepairer:
+    class: Drupal\drupal_developer_assistant\Agent\GroundedAnswerRepairer
+    arguments:
+      - '@ai.provider'
+      - '@Drupal\drupal_developer_assistant\Agent\GroundedAnswerRepairInputBuilder'
+      - '@Drupal\drupal_developer_assistant\Agent\GroundedAnswerRepairResponseParser'
+
+  Drupal\drupal_developer_assistant\Agent\GroundedAnswerRepairerInterface: '@Drupal\drupal_developer_assistant\Agent\GroundedAnswerRepairer'
+
+  Drupal\drupal_developer_assistant\Form\ComponentFilterForm:
+    class: Drupal\drupal_developer_assistant\Form\ComponentFilterForm
+
+  Drupal\drupal_developer_assistant\Form\ModuleArchitectureRefreshForm:
+    class: Drupal\drupal_developer_assistant\Form\ModuleArchitectureRefreshForm
+    arguments:
+      - '@Drupal\drupal_developer_assistant\Architecture\ModuleArchitectureCacheInterface'
+
+  Drupal\drupal_developer_assistant\Controller\InspectorController:
+    class: Drupal\drupal_developer_assistant\Controller\InspectorController
+    arguments:
+      - '@Drupal\drupal_developer_assistant\Collector\CollectorManagerInterface'
+      - '@Drupal\drupal_developer_assistant\Relationship\RelationshipManagerInterface'
+      - '@Drupal\drupal_developer_assistant\Architecture\ModuleArchitectureBuilderInterface'
+      - '@Drupal\drupal_developer_assistant\Collector\ModuleSourceFileCollectorInterface'
+      - '@Drupal\drupal_developer_assistant\Analyzer\PhpSourceAnalyzerInterface'
+      - '@Drupal\Core\Pager\PagerManagerInterface'
+      - '@form_builder'
+      - '@Drupal\drupal_developer_assistant\Form\ComponentFilterForm'
+      - '@Drupal\drupal_developer_assistant\Form\ModuleArchitectureRefreshForm'
+      - '@Drupal\drupal_developer_assistant\Component\ModuleComponentDetailsResolverInterface'
+    public: true
+
+  Drupal\drupal_developer_assistant\Controller\ModuleContextController:
+    class: Drupal\drupal_developer_assistant\Controller\ModuleContextController
+    arguments:
+      - '@Drupal\drupal_developer_assistant\Architecture\ModuleArchitectureBuilderInterface'
+      - '@Drupal\drupal_developer_assistant\Context\ModuleContextBuilderInterface'
+    public: true
+
+  Drupal\drupal_developer_assistant\Controller\ModuleEvidenceController:
+    class: Drupal\drupal_developer_assistant\Controller\ModuleEvidenceController
+    arguments:
+      - '@Drupal\drupal_developer_assistant\Architecture\ModuleArchitectureBuilderInterface'
+      - '@Drupal\drupal_developer_assistant\Evidence\ModuleEvidenceResolverInterface'
+    public: true

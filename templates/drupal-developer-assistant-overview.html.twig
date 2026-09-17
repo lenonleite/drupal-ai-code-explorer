@@ -1,0 +1,29 @@
+{#
+/**
+ * @file
+ * Displays the Drupal Developer Assistant overview.
+ *
+ * Available variables:
+ * - intro: Introductory text for the overview.
+ * - sections: Links to the available inspector sections. Each item contains:
+ *   - title: Translated link title.
+ *   - description: Explanation of the section purpose.
+ *   - url: Drupal URL object for the section route.
+ */
+#}
+<div class="drupal-developer-assistant-overview">
+  <p>{{ intro }}</p>
+
+  {% if sections %}
+    <ul class="drupal-developer-assistant-overview__sections">
+      {% for section in sections %}
+        <li>
+          <strong>{{ link(section.title, section.url) }}</strong>
+          {% if section.description %}
+            <div>{{ section.description }}</div>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+</div>

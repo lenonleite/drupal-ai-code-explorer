@@ -1,0 +1,89 @@
+drupal_developer_assistant.overview:
+  route_name: drupal_developer_assistant.overview
+  title: 'Overview'
+  base_route: drupal_developer_assistant.overview
+
+drupal_developer_assistant.modules:
+  route_name: drupal_developer_assistant.modules
+  title: 'Modules'
+  base_route: drupal_developer_assistant.overview
+
+drupal_developer_assistant.catalog:
+  route_name: drupal_developer_assistant.catalog
+  title: 'Catalog'
+  base_route: drupal_developer_assistant.overview
+
+drupal_developer_assistant.services:
+  route_name: drupal_developer_assistant.services
+  title: 'Services'
+  parent_id: drupal_developer_assistant.catalog
+
+drupal_developer_assistant.plugins:
+  route_name: drupal_developer_assistant.plugins
+  title: 'Plugins'
+  parent_id: drupal_developer_assistant.catalog
+
+drupal_developer_assistant.entities:
+  route_name: drupal_developer_assistant.entities
+  title: 'Entities'
+  parent_id: drupal_developer_assistant.catalog
+
+drupal_developer_assistant.routes:
+  route_name: drupal_developer_assistant.routes
+  title: 'Routes'
+  parent_id: drupal_developer_assistant.catalog
+
+drupal_developer_assistant.controllers:
+  route_name: drupal_developer_assistant.controllers
+  title: 'Controllers'
+  parent_id: drupal_developer_assistant.catalog
+
+drupal_developer_assistant.forms:
+  route_name: drupal_developer_assistant.forms
+  title: 'Forms'
+  parent_id: drupal_developer_assistant.catalog
+
+drupal_developer_assistant.hooks:
+  route_name: drupal_developer_assistant.hooks
+  title: 'Hooks'
+  parent_id: drupal_developer_assistant.catalog
+
+drupal_developer_assistant.configuration:
+  route_name: drupal_developer_assistant.configuration
+  title: 'Configuration'
+  parent_id: drupal_developer_assistant.catalog
+
+drupal_developer_assistant.architecture:
+  route_name: drupal_developer_assistant.architecture
+  title: 'Relationships'
+  parent_id: drupal_developer_assistant.catalog
+
+drupal_developer_assistant.module_overview_task:
+  route_name: drupal_developer_assistant.module_overview
+  title: 'Overview'
+  base_route: drupal_developer_assistant.module_overview
+
+drupal_developer_assistant.module_components_task:
+  route_name: drupal_developer_assistant.module_components
+  title: 'Components'
+  base_route: drupal_developer_assistant.module_overview
+
+drupal_developer_assistant.module_source_files_task:
+  route_name: drupal_developer_assistant.module_source_files
+  title: 'Source files'
+  base_route: drupal_developer_assistant.module_overview
+
+drupal_developer_assistant.module_php_structure_task:
+  route_name: drupal_developer_assistant.module_php_structure
+  title: 'PHP structure'
+  base_route: drupal_developer_assistant.module_overview
+
+drupal_developer_assistant.module_relationships_task:
+  route_name: drupal_developer_assistant.module_relationships
+  title: 'Relationships'
+  base_route: drupal_developer_assistant.module_overview
+
+drupal_developer_assistant.module_context_task:
+  route_name: drupal_developer_assistant.module_context
+  title: 'Agent context'
+  base_route: drupal_developer_assistant.module_overview

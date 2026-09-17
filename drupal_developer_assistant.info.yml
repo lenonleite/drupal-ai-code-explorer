@@ -1,0 +1,9 @@
+name: Drupal Developer Assistant
+type: module
+description: 'Provides tools for inspecting and understanding a Drupal codebase.'
+package: Development
+core_version_requirement: ^11
+dependencies:
+  - ai:ai
+  - ai_agents:ai_agents
+  - ai_agents:ai_agents_explorer

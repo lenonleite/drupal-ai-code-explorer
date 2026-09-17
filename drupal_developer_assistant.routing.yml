@@ -1,0 +1,229 @@
+drupal_developer_assistant.overview:
+  path: '/admin/reports/drupal-developer-assistant'
+  defaults:
+    _controller: 'Drupal\drupal_developer_assistant\Controller\InspectorController::overview'
+    _title: 'Drupal Developer Assistant'
+  requirements:
+    _permission: 'access drupal developer assistant'
+  options:
+    _admin_route: true
+
+drupal_developer_assistant.modules:
+  path: '/admin/reports/drupal-developer-assistant/modules'
+  defaults:
+    _controller: 'Drupal\drupal_developer_assistant\Controller\InspectorController::modules'
+    _title: 'Modules'
+  requirements:
+    _permission: 'access drupal developer assistant'
+  options:
+    _admin_route: true
+
+drupal_developer_assistant.catalog:
+  path: '/admin/reports/drupal-developer-assistant/catalog'
+  defaults:
+    _controller: 'Drupal\drupal_developer_assistant\Controller\InspectorController::catalog'
+    _title: 'Catalog'
+  requirements:
+    _permission: 'access drupal developer assistant'
+  options:
+    _admin_route: true
+
+drupal_developer_assistant.services:
+  path: '/admin/reports/drupal-developer-assistant/services'
+  defaults:
+    _controller: 'Drupal\drupal_developer_assistant\Controller\InspectorController::services'
+    _title: 'Services'
+  requirements:
+    _permission: 'access drupal developer assistant'
+  options:
+    _admin_route: true
+
+drupal_developer_assistant.plugins:
+  path: '/admin/reports/drupal-developer-assistant/plugins'
+  defaults:
+    _controller: 'Drupal\drupal_developer_assistant\Controller\InspectorController::plugins'
+    _title: 'Plugins'
+  requirements:
+    _permission: 'access drupal developer assistant'
+  options:
+    _admin_route: true
+
+drupal_developer_assistant.plugins.block:
+  path: '/admin/reports/drupal-developer-assistant/plugins/block'
+  defaults:
+    _controller: 'Drupal\drupal_developer_assistant\Controller\InspectorController::blockPlugins'
+    _title: 'Block plugins'
+  requirements:
+    _permission: 'access drupal developer assistant'
+  options:
+    _admin_route: true
+
+drupal_developer_assistant.plugins.action:
+  path: '/admin/reports/drupal-developer-assistant/plugins/action'
+  defaults:
+    _controller: 'Drupal\drupal_developer_assistant\Controller\InspectorController::actionPlugins'
+    _title: 'Action plugins'
+  requirements:
+    _permission: 'access drupal developer assistant'
+  options:
+    _admin_route: true
+
+drupal_developer_assistant.entities:
+  path: '/admin/reports/drupal-developer-assistant/entities'
+  defaults:
+    _controller: 'Drupal\drupal_developer_assistant\Controller\InspectorController::entities'
+    _title: 'Entity types'
+  requirements:
+    _permission: 'access drupal developer assistant'
+  options:
+    _admin_route: true
+
+drupal_developer_assistant.routes:
+  path: '/admin/reports/drupal-developer-assistant/routes'
+  defaults:
+    _controller: 'Drupal\drupal_developer_assistant\Controller\InspectorController::routes'
+    _title: 'Routes'
+  requirements:
+    _permission: 'access drupal developer assistant'
+  options:
+    _admin_route: true
+
+drupal_developer_assistant.controllers:
+  path: '/admin/reports/drupal-developer-assistant/controllers'
+  defaults:
+    _controller: 'Drupal\drupal_developer_assistant\Controller\InspectorController::controllers'
+    _title: 'Controllers'
+  requirements:
+    _permission: 'access drupal developer assistant'
+  options:
+    _admin_route: true
+
+drupal_developer_assistant.forms:
+  path: '/admin/reports/drupal-developer-assistant/forms'
+  defaults:
+    _controller: 'Drupal\drupal_developer_assistant\Controller\InspectorController::forms'
+    _title: 'Forms'
+  requirements:
+    _permission: 'access drupal developer assistant'
+  options:
+    _admin_route: true
+
+drupal_developer_assistant.hooks:
+  path: '/admin/reports/drupal-developer-assistant/hooks'
+  defaults:
+    _controller: 'Drupal\drupal_developer_assistant\Controller\InspectorController::hooks'
+    _title: 'Hooks'
+  requirements:
+    _permission: 'access drupal developer assistant'
+  options:
+    _admin_route: true
+
+drupal_developer_assistant.configuration:
+  path: '/admin/reports/drupal-developer-assistant/configuration'
+  defaults:
+    _controller: 'Drupal\drupal_developer_assistant\Controller\InspectorController::configuration'
+    _title: 'Configuration'
+  requirements:
+    _permission: 'access drupal developer assistant'
+  options:
+    _admin_route: true
+
+drupal_developer_assistant.architecture:
+  path: '/admin/reports/drupal-developer-assistant/architecture'
+  defaults:
+    _controller: 'Drupal\drupal_developer_assistant\Controller\InspectorController::architecture'
+    _title: 'Relationships'
+  requirements:
+    _permission: 'access drupal developer assistant'
+  options:
+    _admin_route: true
+
+drupal_developer_assistant.module_overview:
+  path: '/admin/reports/drupal-developer-assistant/modules/{module_id}'
+  defaults:
+    _controller: 'Drupal\drupal_developer_assistant\Controller\InspectorController::moduleOverview'
+    _title: 'Module overview'
+  requirements:
+    _permission: 'access drupal developer assistant'
+    module_id: '[a-z0-9_]+'
+  options:
+    _admin_route: true
+
+drupal_developer_assistant.module_components:
+  path: '/admin/reports/drupal-developer-assistant/modules/{module_id}/components'
+  defaults:
+    _controller: 'Drupal\drupal_developer_assistant\Controller\InspectorController::moduleComponents'
+    _title: 'Module components'
+  requirements:
+    _permission: 'access drupal developer assistant'
+    module_id: '[a-z0-9_]+'
+  options:
+    _admin_route: true
+
+drupal_developer_assistant.module_source_files:
+  path: '/admin/reports/drupal-developer-assistant/modules/{module_id}/files'
+  defaults:
+    _controller: 'Drupal\drupal_developer_assistant\Controller\InspectorController::moduleSourceFiles'
+    _title: 'Source files'
+  requirements:
+    _permission: 'access drupal developer assistant'
+    module_id: '[a-z0-9_]+'
+  options:
+    _admin_route: true
+
+drupal_developer_assistant.module_php_structure:
+  path: '/admin/reports/drupal-developer-assistant/modules/{module_id}/php'
+  defaults:
+    _controller: 'Drupal\drupal_developer_assistant\Controller\InspectorController::modulePhpStructure'
+    _title: 'PHP structure'
+  requirements:
+    _permission: 'access drupal developer assistant'
+    module_id: '[a-z0-9_]+'
+  options:
+    _admin_route: true
+
+drupal_developer_assistant.module_relationships:
+  path: '/admin/reports/drupal-developer-assistant/modules/{module_id}/relationships'
+  defaults:
+    _controller: 'Drupal\drupal_developer_assistant\Controller\InspectorController::moduleRelationships'
+    _title: 'Module relationships'
+  requirements:
+    _permission: 'access drupal developer assistant'
+    module_id: '[a-z0-9_]+'
+  options:
+    _admin_route: true
+
+drupal_developer_assistant.module_component:
+  path: '/admin/reports/drupal-developer-assistant/modules/{module_id}/components/{component_reference}'
+  defaults:
+    _controller: 'Drupal\drupal_developer_assistant\Controller\InspectorController::moduleComponent'
+    _title: 'Component details'
+  requirements:
+    _permission: 'access drupal developer assistant'
+    module_id: '[a-z0-9_]+'
+    component_reference: '[a-f0-9]{64}'
+  options:
+    _admin_route: true
+
+drupal_developer_assistant.module_context:
+  path: '/admin/reports/drupal-developer-assistant/modules/{module_id}/context'
+  defaults:
+    _controller: 'Drupal\drupal_developer_assistant\Controller\ModuleContextController::preview'
+    _title: 'AI context preview'
+  requirements:
+    _permission: 'access drupal developer assistant'
+    module_id: '[a-z0-9_]+'
+  options:
+    _admin_route: true
+
+drupal_developer_assistant.module_evidence:
+  path: '/admin/reports/drupal-developer-assistant/modules/{module_id}/evidence/{evidence_id}'
+  defaults:
+    _controller: 'Drupal\drupal_developer_assistant\Controller\ModuleEvidenceController::view'
+    _title: 'Source evidence'
+  requirements:
+    _permission: 'access drupal developer assistant,view drupal developer assistant source'
+    module_id: '[a-z0-9_]+'
+    evidence_id: '[a-f0-9]{64}'
+  options:
+    _admin_route: true

@@ -1,0 +1,140 @@
+name: Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Drupal module test suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_DATABASE: drupal
+          MYSQL_USER: drupal
+          MYSQL_PASSWORD: drupal
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      DRUPAL_PROJECT: /tmp/drupal
+      MODULE_PATH: /tmp/drupal/web/modules/contrib/drupal_developer_assistant
+      SIMPLETEST_BASE_URL: http://127.0.0.1:8888
+      SIMPLETEST_DB: mysql://drupal:drupal@127.0.0.1/drupal
+
+    steps:
+      - name: Check out the module
+        uses: actions/checkout@v5
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: gd, mbstring, pdo_mysql
+          coverage: none
+
+      - name: Validate module Composer metadata
+        run: composer validate --no-check-publish
+
+      - name: Create the Drupal test project
+        run: >-
+          composer create-project
+          drupal/recommended-project:^11.4
+          "$DRUPAL_PROJECT"
+          --no-interaction
+          --prefer-dist
+
+      - name: Register the checked-out module
+        working-directory: /tmp/drupal
+        run: >-
+          composer config repositories.drupal_developer_assistant
+          "{\"type\":\"path\",\"url\":\"$GITHUB_WORKSPACE\",\"options\":{\"symlink\":false}}"
+
+      - name: Install the module and test dependencies
+        working-directory: /tmp/drupal
+        run: >-
+          composer require
+          drupal/drupal_developer_assistant:@dev
+          --no-interaction
+          --prefer-dist
+          --with-all-dependencies
+
+      - name: Install Drupal development tools
+        working-directory: /tmp/drupal
+        run: >-
+          composer require --dev
+          drupal/core-dev:^11.4
+          --no-interaction
+          --prefer-dist
+          --with-all-dependencies
+
+      - name: Check Drupal coding standards
+        working-directory: /tmp/drupal
+        run: >-
+          vendor/bin/phpcs
+          --standard=Drupal,DrupalPractice
+          "$MODULE_PATH"
+
+      - name: Run unit tests
+        working-directory: /tmp/drupal
+        run: >-
+          vendor/bin/phpunit
+          -c web/core
+          "$MODULE_PATH/tests/src/Unit"
+
+      - name: Prepare Drupal test environment
+        working-directory: /tmp/drupal
+        run: install -d -m 0777 web/sites/simpletest/browser_output
+
+      - name: Run kernel tests
+        working-directory: /tmp/drupal
+        run: >-
+          vendor/bin/phpunit
+          -c web/core
+          "$MODULE_PATH/tests/src/Kernel"
+
+      - name: Start the functional-test web server
+        working-directory: /tmp/drupal
+        run: |
+          nohup php -S 127.0.0.1:8888 -t web web/.ht.router.php \
+            > /tmp/drupal-php-server.log 2>&1 &
+          for attempt in {1..20}; do
+            if curl --silent --output /dev/null http://127.0.0.1:8888; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/drupal-php-server.log
+          exit 1
+
+      - name: Run functional tests
+        working-directory: /tmp/drupal
+        run: |
+          vendor/bin/phpunit \
+            -c web/core \
+            "$MODULE_PATH/tests/src/Functional" || {
+              cat /tmp/drupal-php-server.log
+              exit 1
+            }
