@@ -47,14 +47,16 @@ jobs:
           -c web/core
           web/modules/custom/drupal_developer_assistant/tests/src/Unit
 
+      - name: Prepare Drupal test environment
+        run: ddev exec install -d -m 0777 web/sites/simpletest/browser_output
+
       - name: Run kernel tests
         run: >-
-          ddev exec vendor/bin/phpunit
+          ddev exec env
+          SIMPLETEST_DB=mysql://db:db@db/db
+          vendor/bin/phpunit
           -c web/core
           web/modules/custom/drupal_developer_assistant/tests/src/Kernel
-
-      - name: Prepare functional-test output directory
-        run: ddev exec install -d -m 0777 web/sites/simpletest/browser_output
 
       - name: Run functional tests
         run: >-

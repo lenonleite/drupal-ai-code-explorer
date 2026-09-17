@@ -192,7 +192,8 @@ ddev exec vendor/bin/phpunit -c web/core \
   web/modules/custom/drupal_developer_assistant/tests/src/Unit
 
 # Kernel tests.
-ddev exec vendor/bin/phpunit -c web/core \
+ddev exec env SIMPLETEST_DB=mysql://db:db@db/db \
+  vendor/bin/phpunit -c web/core \
   web/modules/custom/drupal_developer_assistant/tests/src/Kernel
 
 # Drupal coding standards.
