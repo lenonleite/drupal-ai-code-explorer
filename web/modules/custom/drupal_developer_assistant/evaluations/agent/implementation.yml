@@ -1,0 +1,12 @@
+id: automated_cron_request_execution
+module: automated_cron
+question: 'How does automated_cron run cron after an HTTP request?'
+expected:
+  tool_sequence:
+    - drupal_developer_assistant_inspect_module
+    - drupal_developer_assistant_search_module_source
+    - drupal_developer_assistant_validate_grounded_answer
+  required_answer_headings:
+    - '### Confirmed by source'
+  required_evidence_paths:
+    - core/modules/automated_cron/src/EventSubscriber/AutomatedCron.php

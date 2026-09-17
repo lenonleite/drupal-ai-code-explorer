@@ -1,0 +1,9 @@
+access drupal developer assistant:
+  title: 'Access Drupal Developer Assistant'
+  description: 'View Drupal Developer Assistant reports.'
+  restrict access: true
+
+view drupal developer assistant source:
+  title: 'View Drupal Developer Assistant source evidence'
+  description: 'Allow the AI assistant to retrieve bounded source excerpts.'
+  restrict access: true

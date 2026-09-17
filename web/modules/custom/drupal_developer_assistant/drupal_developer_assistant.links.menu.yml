@@ -1,0 +1,6 @@
+drupal_developer_assistant.overview:
+  title: 'Drupal Developer Assistant'
+  description: 'Inspect and understand this Drupal installation.'
+  route_name: drupal_developer_assistant.overview
+  parent: system.admin_reports
+  weight: 100

@@ -1,0 +1,63 @@
+name: Tests
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Drupal module test suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v5
+
+      - name: Start DDEV
+        uses: ddev/github-action-setup-ddev@v1
+
+      - name: Install Composer dependencies
+        run: ddev composer install --no-interaction --prefer-dist
+
+      - name: Validate Composer configuration
+        run: ddev composer validate --no-check-publish
+
+      - name: Check Drupal coding standards
+        run: >-
+          ddev exec vendor/bin/phpcs
+          --standard=Drupal,DrupalPractice
+          web/modules/custom/drupal_developer_assistant
+
+      - name: Run unit tests
+        run: >-
+          ddev exec vendor/bin/phpunit
+          -c web/core
+          web/modules/custom/drupal_developer_assistant/tests/src/Unit
+
+      - name: Run kernel tests
+        run: >-
+          ddev exec vendor/bin/phpunit
+          -c web/core
+          web/modules/custom/drupal_developer_assistant/tests/src/Kernel
+
+      - name: Prepare functional-test output directory
+        run: ddev exec install -d -m 0777 web/sites/simpletest/browser_output
+
+      - name: Run functional tests
+        run: >-
+          ddev exec env
+          SIMPLETEST_BASE_URL=https://drupal-plugin-ia.ddev.site
+          SIMPLETEST_DB=mysql://db:db@db/db
+          vendor/bin/phpunit
+          -c web/core
+          web/modules/custom/drupal_developer_assistant/tests/src/Functional

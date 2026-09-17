@@ -1,0 +1,32 @@
+# Local agent and IDE state.
+/.agents/
+/.codex/
+/.idea/
+/.vscode/
+
+# Composer-installed dependencies and Drupal contributed code.
+/vendor/
+/web/core/
+/web/libraries/
+/web/modules/contrib/
+/web/profiles/contrib/
+/web/themes/contrib/
+
+# Runtime and test artifacts.
+/.phpunit.result.cache
+/web/sites/simpletest/
+/web/sites/*/files/
+/web/sites/*/private/
+/web/sites/default/settings.php
+/web/sites/default/settings.ddev.php
+/web/sites/default/settings.local.php
+/web/sites/default/services.yml
+
+# Local environment and secret files.
+/.env
+/.env.*
+!/.env.example
+
+# Operating-system files.
+.DS_Store
+Thumbs.db

@@ -1,0 +1,36 @@
+<?php
+
+/**
+ * @file
+ * Theme integration for the Drupal Developer Assistant module.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Implements hook_theme().
+ */
+function drupal_developer_assistant_theme(): array {
+  return [
+    'drupal_developer_assistant_overview' => [
+      'variables' => [
+        'intro' => NULL,
+        'sections' => [],
+      ],
+    ],
+  ];
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for the AI Agent Explorer form.
+ */
+function drupal_developer_assistant_form_ai_agents_explorer_alter(array &$form, FormStateInterface $form_state): void {
+  $start_new = \Drupal::request()->query->getBoolean(
+    'drupal_developer_assistant_new',
+  );
+  if ($start_new && isset($form['wrapper']['prompt'])) {
+    $form['wrapper']['prompt']['#default_value'] = '';
+  }
+}
