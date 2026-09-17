@@ -181,8 +181,9 @@ ddev drush cr
 The automated test suite does not call an external AI provider.
 
 GitHub Actions runs Composer validation, Drupal coding standards, and the unit,
-kernel, and functional suites on every push to `main`. The same workflow can be
-started manually from the repository's **Actions** page. See
+kernel, and functional suites on pull requests targeting `main` and on every
+push to `main`. The same workflow can be started manually from the repository's
+**Actions** page. See
 [`tests.yml`](../../../../.github/workflows/tests.yml).
 
 ```bash
