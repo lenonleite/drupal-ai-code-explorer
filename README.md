@@ -119,6 +119,16 @@ The normal developer flow is:
    with the Drupal Developer Assistant selected; it does not send an AI request.
 5. Enter a question and select **Run Agent**.
 
+The Agent Explorer starts with the assistant, question, and model selected. No
+AI request is made until **Run Agent** is selected:
+
+![Drupal Developer Assistant question prepared in AI Agent Explorer](docs/images/ai-agent-explorer-question.png)
+
+While the agent runs, the progress panel shows its retrieval and validation
+steps. The grounded answer is displayed after the final validation step:
+
+![Completed agent progress and grounded answer](docs/images/ai-agent-explorer-grounded-answer.png)
+
 You can also start a clean conversation directly at:
 
 ```text
