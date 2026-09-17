@@ -115,26 +115,32 @@ jobs:
           -c web/core
           "$MODULE_PATH/tests/src/Kernel"
 
-      - name: Start the functional-test web server
-        working-directory: /tmp/drupal
-        run: |
-          nohup php -S 127.0.0.1:8888 -t web web/.ht.router.php \
-            > /tmp/drupal-php-server.log 2>&1 &
-          for attempt in {1..20}; do
-            if curl --silent --output /dev/null http://127.0.0.1:8888; then
-              exit 0
-            fi
-            sleep 1
-          done
-          cat /tmp/drupal-php-server.log
-          exit 1
-
       - name: Run functional tests
         working-directory: /tmp/drupal
         run: |
-          vendor/bin/phpunit \
+          php -S 127.0.0.1:8888 -t web web/.ht.router.php \
+            > /tmp/drupal-php-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+
+          server_ready=0
+          for attempt in {1..20}; do
+            if curl --silent --output /dev/null http://127.0.0.1:8888; then
+              server_ready=1
+              break
+            fi
+            sleep 1
+          done
+
+          if [ "$server_ready" -ne 1 ]; then
+            cat /tmp/drupal-php-server.log
+            exit 1
+          fi
+
+          if ! vendor/bin/phpunit \
             -c web/core \
-            "$MODULE_PATH/tests/src/Functional" || {
-              cat /tmp/drupal-php-server.log
-              exit 1
-            }
+            "$MODULE_PATH/tests/src/Functional" \
+            2>&1 | tee /tmp/drupal-functional-tests.log; then
+            cat /tmp/drupal-php-server.log
+            exit 1
+          fi
